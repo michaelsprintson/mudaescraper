@@ -13,11 +13,13 @@ load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 # demon's sword master of excalibur school.
 
-bi = pickle.load(open("data/bundle_info.p", 'rb'))
-scrapelist = bi[list(bi.keys())[0]]['series'][322:]
+# bi = pickle.load(open("data/bundle_info.p", 'rb'))
+# scrapelist = bi[list(bi.keys())[0]]['series'][322:]
+wa = pickle.load(open("data/wa_series_info.p", 'rb'))
+scrapelist = list(wa.keys())
 # scrapelist = ['cowboy bebop']
 
-srape_location = "test.json"
+srape_location = "big_scrape.json"
 
 from collections import defaultdict
 import discum     
