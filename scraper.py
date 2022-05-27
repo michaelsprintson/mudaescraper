@@ -15,9 +15,12 @@ DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
 # bi = pickle.load(open("data/bundle_info.p", 'rb'))
 # scrapelist = bi[list(bi.keys())[0]]['series'][322:]
-wa = pickle.load(open("data/wa_series_info.p", 'rb'))
-scrapelist = list(wa.keys())
-# scrapelist = ['cowboy bebop']
+# wa = pickle.load(open("data/wa_series_info.p", 'rb'))
+# scrapelist = list(wa.keys())
+scrapelist = [
+ 'tantei opera milky holmes']
+#  'oruchuban ebichu',
+#  'autophagy regulation']
 
 srape_location = "big_scrape.json"
 
@@ -28,6 +31,7 @@ bot = discum.Client(token=DISCORD_TOKEN, log=False)
 def get_chars(charlist):
     chars_in_ser = defaultdict(lambda: {})
     for li in charlist.split("\n"):
+        # print(li)
         char_name = li.split("·")[0]
         if "," in li.split("·")[1]:
             count = li.split("·")[1].count(",")
@@ -35,7 +39,7 @@ def get_chars(charlist):
             intert = reduce(lambda a,b: a+b, terms)
             ss = f"\*\({intert}(?P<term{count}>\$[w|m|h][a|x|g])\)\* \*\*(?P<val>\d+)\*\*"
             test = re.search(ss, li.split("·")[1])
-            chars_in_ser[char_name]['term'] = [test.group(f"term{i}").strip("$") for i in range(0,count)]
+            chars_in_ser[char_name]['term'] = [test.group(f"term{i}").strip("$") for i in range(0,count+1)]
         else:
             test = re.search("\*\((?P<term>\$[w|m|h][a|x|g])\)\* \*\*(?P<val>\d+)\*\*", li.split("·")[1])
             chars_in_ser[char_name]['term'] = test.group("term").strip("$")
@@ -51,10 +55,10 @@ def helloworld(resp):
     
     if resp.event.message:
         m = resp.parsed.auto()
-        if m['author']['id'] == "432610292342587392":
+        if (m['author']['id'] == "432610292342587392") and (len(m['embeds'])>0):
             seriesinfo = defaultdict(lambda: {})
             desc = m['embeds'][0]['description']
-            is_there_a_title_in_desc = not "wa" in desc.split("\n\n")[0]
+            is_there_a_title_in_desc = not "$wa" in desc.split("\n\n")[0]
             # ser_name = desc.split("\n\n")[0].strip(" ").strip("*")
             ser_name = m['embeds'][0]['author']['name'].split("  ")[0]
             title_offset = 1 if is_there_a_title_in_desc else 0
@@ -65,6 +69,7 @@ def helloworld(resp):
             seriesinfo[ser_name]['total_val'] = int(re.search("(?P<word>\*\*\d+\*\*)", list_imak[1]).group().strip("**"))
 
             if 'footer' in m['embeds'][0]:
+                print("init get_chars", list_imak[2])
                 lod = [get_chars(list_imak[2])]
                 for i in range(0, int(m['embeds'][0]['footer']['text'].split("/")[1])-1):
                     message = bot.getMessage(m['channel_id'], m['id'])
@@ -79,12 +84,16 @@ def helloworld(resp):
                         messageFlags=data["flags"],
                         data=buts.getButton(emojiName='wright'),
                     )
-                    sleep(2)
-                    message = bot.getMessage(m['channel_id'], m['id'])
-                    desc = message.json()[0]['embeds'][0]['description']
-                    lod.append(get_chars(desc))
+                    sleep(15)
+                    # message = bot.getMessage(m['channel_id'], m['id'])
+                    # desc = message.json()[0]['embeds'][0]['description']
+                    # if "Total value:" in desc:
+                    #     sleep(3)
+                    # print("other get_chars", desc)
+                    # lod.append(get_chars(desc))
                 seriesinfo[ser_name]['chars'] = reduce(lambda a,b: {**a, **b}, lod)
             else:
+                print('sent to get_chars', list_imak[2], "current total_val", seriesinfo[ser_name]['total_val'], ser_name)
                 seriesinfo[ser_name]['chars'] = get_chars(list_imak[2])
             # print(chars_in_ser)
             json.dump(seriesinfo, open(srape_location, 'a'))
