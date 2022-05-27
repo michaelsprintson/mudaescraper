@@ -69,7 +69,6 @@ def helloworld(resp):
             seriesinfo[ser_name]['total_val'] = int(re.search("(?P<word>\*\*\d+\*\*)", list_imak[1]).group().strip("**"))
 
             if 'footer' in m['embeds'][0]:
-                print("init get_chars", list_imak[2])
                 lod = [get_chars(list_imak[2])]
                 for i in range(0, int(m['embeds'][0]['footer']['text'].split("/")[1])-1):
                     message = bot.getMessage(m['channel_id'], m['id'])
@@ -84,13 +83,9 @@ def helloworld(resp):
                         messageFlags=data["flags"],
                         data=buts.getButton(emojiName='wright'),
                     )
-                    sleep(15)
-                    # message = bot.getMessage(m['channel_id'], m['id'])
-                    # desc = message.json()[0]['embeds'][0]['description']
-                    # if "Total value:" in desc:
-                    #     sleep(3)
-                    # print("other get_chars", desc)
-                    # lod.append(get_chars(desc))
+                    message = bot.getMessage(m['channel_id'], m['id'])
+                    desc = message.json()[0]['embeds'][0]['description']
+                    lod.append(get_chars(desc))
                 seriesinfo[ser_name]['chars'] = reduce(lambda a,b: {**a, **b}, lod)
             else:
                 print('sent to get_chars', list_imak[2], "current total_val", seriesinfo[ser_name]['total_val'], ser_name)
