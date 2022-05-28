@@ -15,12 +15,10 @@ DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
 # bi = pickle.load(open("data/bundle_info.p", 'rb'))
 # scrapelist = bi[list(bi.keys())[0]]['series'][322:]
-# wa = pickle.load(open("data/wa_series_info.p", 'rb'))
-# scrapelist = list(wa.keys())
-scrapelist = [
- 'tantei opera milky holmes']
-#  'oruchuban ebichu',
-#  'autophagy regulation']
+wa = pickle.load(open("data/wa_series_info.p", 'rb'))
+scrapelist = list(wa.keys())
+# scrapelist = list(json.load(open("failed.json",'r')))
+# scrapelist = ['Free!', 'Sweet Punishment', 'Hiveswap Friendsim', 'NBA', ]
 
 srape_location = "big_scrape.json"
 
@@ -31,17 +29,17 @@ bot = discum.Client(token=DISCORD_TOKEN, log=False)
 def get_chars(charlist):
     chars_in_ser = defaultdict(lambda: {})
     for li in charlist.split("\n"):
-        # print(li)
-        char_name = li.split("·")[0]
-        if "," in li.split("·")[1]:
-            count = li.split("·")[1].count(",")
+        splitstring = "· *"
+        char_name = li.split(splitstring)[0]
+        if "," in li.split(splitstring)[1]:
+            count = li.split(splitstring)[1].count(",")
             terms = [f"(?P<term{i}>\$[w|m|h][a|x|g]), " for i in range(0, count)]
             intert = reduce(lambda a,b: a+b, terms)
-            ss = f"\*\({intert}(?P<term{count}>\$[w|m|h][a|x|g])\)\* \*\*(?P<val>\d+)\*\*"
-            test = re.search(ss, li.split("·")[1])
+            ss = f"\({intert}(?P<term{count}>\$[w|m|h][a|x|g])\)\* \*\*(?P<val>\d+)\*\*"
+            test = re.search(ss, li.split(splitstring)[1])
             chars_in_ser[char_name]['term'] = [test.group(f"term{i}").strip("$") for i in range(0,count+1)]
         else:
-            test = re.search("\*\((?P<term>\$[w|m|h][a|x|g])\)\* \*\*(?P<val>\d+)\*\*", li.split("·")[1])
+            test = re.search("\((?P<term>\$[w|m|h][a|x|g])\)\* \*\*(?P<val>\d+)\*\*", li.split(splitstring)[1])
             chars_in_ser[char_name]['term'] = test.group("term").strip("$")
         chars_in_ser[char_name]['val'] = int(test.group("val"))
         
@@ -61,6 +59,7 @@ def helloworld(resp):
             is_there_a_title_in_desc = not "$wa" in desc.split("\n\n")[0]
             # ser_name = desc.split("\n\n")[0].strip(" ").strip("*")
             ser_name = m['embeds'][0]['author']['name'].split("  ")[0]
+            print(ser_name)
             title_offset = 1 if is_there_a_title_in_desc else 0
             list_imak = desc.split("\n\n")[title_offset:]
             list_char_sels = re.findall("(\d+ \$[w|h|m][a|x|g])+", list_imak[0])
@@ -74,7 +73,7 @@ def helloworld(resp):
                     message = bot.getMessage(m['channel_id'], m['id'])
                     data = message.json()[0]
                     buts = Buttoner(data["components"])
-                    sleep(1)
+                    # sleep(1)
                     bot.click(
                         data["author"]["id"],
                         channelID=data["channel_id"],
@@ -83,12 +82,13 @@ def helloworld(resp):
                         messageFlags=data["flags"],
                         data=buts.getButton(emojiName='wright'),
                     )
+                    sleep(2)
                     message = bot.getMessage(m['channel_id'], m['id'])
                     desc = message.json()[0]['embeds'][0]['description']
                     lod.append(get_chars(desc))
                 seriesinfo[ser_name]['chars'] = reduce(lambda a,b: {**a, **b}, lod)
             else:
-                print('sent to get_chars', list_imak[2], "current total_val", seriesinfo[ser_name]['total_val'], ser_name)
+                # print("get chars called here on ", list_imak[2])
                 seriesinfo[ser_name]['chars'] = get_chars(list_imak[2])
             # print(chars_in_ser)
             json.dump(seriesinfo, open(srape_location, 'a'))
