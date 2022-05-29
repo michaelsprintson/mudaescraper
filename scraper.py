@@ -8,6 +8,7 @@ from functools import reduce
 import pickle
 from dotenv import load_dotenv
 import os
+import numpy as np
 load_dotenv()
 # Grab the API token from the .env file.
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
@@ -48,6 +49,8 @@ def get_chars(charlist):
 
 @bot.gateway.command
 def helloworld(resp):
+    global scrape_channel
+    
     if resp.event.ready_supplemental: #ready_supplemental is sent after ready
         user = bot.gateway.session.user
         print("Logged in as {}#{}".format(user['username'], user['discriminator']))
@@ -61,7 +64,6 @@ def helloworld(resp):
             is_there_a_title_in_desc = not "$wa" in desc.split("\n\n")[0]
             # ser_name = desc.split("\n\n")[0].strip(" ").strip("*")
             ser_name = m['embeds'][0]['author']['name'].split("  ")[0]
-            print(ser_name)
             title_offset = 1 if is_there_a_title_in_desc else 0
             list_imak = desc.split("\n\n")[title_offset:]
             list_char_sels = re.findall("(\d+ \$[w|h|m][a|x|g])+", list_imak[0])
@@ -97,8 +99,9 @@ def helloworld(resp):
         # 
         if m['content'] == "$startscrape":
             scrape_channel = m['channel_id']
-            for ser in scrapelist:
+            for i, ser in enumerate(scrapelist):
                 sleep(3)
+                print(ser_name, np.around(100*(i / len(scrapelist)), decimals = 2),"percent done")
                 bot.sendMessage(m['channel_id'],f"$imakt {ser}")
 
             
