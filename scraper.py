@@ -21,6 +21,7 @@ scrapelist = list(wa.keys())
 # scrapelist = ['Free!', 'Sweet Punishment', 'Hiveswap Friendsim', 'NBA', ]
 
 srape_location = "big_scrape.json"
+scrape_channel = None
 
 from collections import defaultdict
 import discum     
@@ -53,7 +54,8 @@ def helloworld(resp):
     
     if resp.event.message:
         m = resp.parsed.auto()
-        if (m['author']['id'] == "432610292342587392") and (len(m['embeds'])>0):
+        if (m['author']['id'] == "432610292342587392") and (len(m['embeds'])>0) and (m['channel_id'] == scrape_channel):
+            
             seriesinfo = defaultdict(lambda: {})
             desc = m['embeds'][0]['description']
             is_there_a_title_in_desc = not "$wa" in desc.split("\n\n")[0]
@@ -94,6 +96,7 @@ def helloworld(resp):
             json.dump(seriesinfo, open(srape_location, 'a'))
         # 
         if m['content'] == "$startscrape":
+            scrape_channel = m['channel_id']
             for ser in scrapelist:
                 sleep(3)
                 bot.sendMessage(m['channel_id'],f"$imakt {ser}")
