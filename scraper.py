@@ -101,7 +101,7 @@ def helloworld(resp):
             scrape_channel = m['channel_id']
             for i, ser in enumerate(scrapelist):
                 sleep(3)
-                print(ser_name, np.around(100*(i / len(scrapelist)), decimals = 2),"percent done")
+                print(ser, np.around(100*(i / len(scrapelist)), decimals = 2),"percent done")
                 bot.sendMessage(m['channel_id'],f"$imakt {ser}")
 
             
