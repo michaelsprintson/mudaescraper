@@ -105,5 +105,5 @@ def helloworld(resp):
                 bot.sendMessage(m['channel_id'],f"$imakt {ser}")
 
             
-
+ 
 bot.gateway.run(auto_reconnect=True)
