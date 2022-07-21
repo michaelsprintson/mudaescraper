@@ -11,15 +11,15 @@ import os
 import numpy as np
 load_dotenv()
 # Grab the API token from the .env file.
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN1")
 # demon's sword master of excalibur school.
 
 # bi = pickle.load(open("data/bundle_info.p", 'rb'))
 # scrapelist = bi[list(bi.keys())[0]]['series'][322:]
 wa = pickle.load(open("data/wa_series_info.p", 'rb'))
-scrapelist = list(wa.keys())
+# scrapelist = list(wa.keys())
 # scrapelist = list(json.load(open("failed.json",'r')))
-# scrapelist = ['Free!', 'Sweet Punishment', 'Hiveswap Friendsim', 'NBA', ]
+scrapelist = ['Free!', 'Sweet Punishment', 'Hiveswap Friendsim', 'NBA', ]
 
 srape_location = "big_scrape.json"
 scrape_channel = None
