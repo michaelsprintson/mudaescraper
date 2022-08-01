@@ -12,7 +12,6 @@ import numpy as np
 from datetime import datetime as dt
 from datetime import timedelta
 from threading import Event
-import sys
 load_dotenv()
 # Grab the API token from the .env file.
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN1")
@@ -20,16 +19,15 @@ DISCORD_TOKEN = os.getenv("DISCORD_TOKEN1")
 
 from collections import defaultdict
 import discum     
-from settings import gold_to_return
 bot = discum.Client(token=DISCORD_TOKEN, log=False)
 start_time = dt.now()
-sleepcount = int(sys.argv[1])
-last_roll = dt.now() - timedelta(minutes = int(sys.argv[2]))
+sleepcount = 0
+last_roll = dt.now() - timedelta(minutes = 60)
 import time
 num_bots = 6
 SPAM_CHANNEL = "980201775950868532"
 admin_bot_id = "978030120734445628"
-# disabled_dict = json.load(open("../mudaegambling/storage_dicts/ser_dl.json"))
+disabled_dict = json.load(open("../mudaegambling/storage_dicts/ser_dl.json"))
 final_dict = None
 
 bot_ids = [
@@ -40,6 +38,10 @@ bot_ids = [
     981323272887095366,
     981324103120224276,
 ]
+
+bot_finish = Event()
+pr_finish = Event()
+reset_finish = Event()
 
 @bot.gateway.command
 def helloworld(resp):
@@ -54,7 +56,7 @@ def helloworld(resp):
         if m['content'] == "$allbotreset":
 
             bot.sendMessage(SPAM_CHANNEL,f"$specbotreset 1")
-            sleep(30)
+            reset_finish.wait(timeout = 60)
 
             for i in range(1,num_bots):
                 sleep(1)
@@ -63,11 +65,24 @@ def helloworld(resp):
                 bot.sendMessage(SPAM_CHANNEL,"y")
                 time.sleep(2)
                 bot.sendMessage(SPAM_CHANNEL,f"$specbotreset {i+1}")
-                sleep(30)
+                reset_finish.wait(timeout = 60)
 
                 bot.sendMessage(SPAM_CHANNEL,f"$pr {bot_ids[i]}")
-                sleep(20)
+                pr_finish.wait(timeout = 30)
             bot.sendMessage(SPAM_CHANNEL,f"$pr {bot_ids[0]}")
+
+        if "finished" == m['content'] and int(m['author']['id']) in bot_ids:
+            print("bot finished, going to next")
+            bot_finish.set()
+            bot_finish.clear()
+        if "prfinished" == m['content'] and int(m['author']['id']) in bot_ids:
+            print("pr finished, going to next")
+            pr_finish.set()
+            pr_finish.clear()
+        if "resetfinished" == m['content'] and int(m['author']['id']) in bot_ids:
+            print("reset finished, going to next")
+            reset_finish.set()
+            reset_finish.clear()
 
 
     if resp.event.ready_supplemental: #ready_supplemental is sent after ready
@@ -104,17 +119,17 @@ def helloworld(resp):
             for i in range(0,num_bots):
                 print(f'calling autobet {i+1} {sleepcount}')
                 sleep(1)
-                bot.sendMessage(SPAM_CHANNEL,f"$givek {bot_ids[i]} {gold_to_return}")
+                bot.sendMessage(SPAM_CHANNEL,f"$givek {bot_ids[i]} 85000")
                 time.sleep(2)
                 bot.sendMessage(SPAM_CHANNEL,"y")
                 time.sleep(2)
 
                 bot.sendMessage(SPAM_CHANNEL, f'$autobet {i+1} {sleepcount}')
-                sleep(180)
+                bot_finish.wait(timeout = 300)
 
             for i in range(1,num_bots):
                 bot.sendMessage(SPAM_CHANNEL,f"$pr {bot_ids[i]}")
-                sleep(20)
+                pr_finish.wait(timeout = 30)
             bot.sendMessage(SPAM_CHANNEL,f"$pr {bot_ids[0]}")
             
 

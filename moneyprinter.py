@@ -14,7 +14,6 @@ load_dotenv()
 # Grab the API token from the .env file.
 bot_num =sys.argv[1]
 DISCORD_TOKEN = os.getenv(f"DISCORD_TOKEN{bot_num}")
-ROLL_NUM = 21
 # demon's sword master of excalibur school.
 
 srape_location = "big_scrape.json"
@@ -26,6 +25,8 @@ bot = discum.Client(token=DISCORD_TOKEN, log=False)
 
 import asyncio
 import time
+from settings import gold_keep_toggle, gold_to_return, roll_num, tier_toggle
+ROLL_NUM = roll_num + 15 # CHANGE THIS TO 10 IF NO PREMIUM
 
 roll_i = None
 username = None
@@ -75,10 +76,17 @@ def helloworld(resp):
         # print(m['author']['id'])
         if (m['content'][:14] == f"$specbotecho {bot_num}") and m['author']['id'] == "138336085703917568":
             sleep(2)
-            if int(bot_num) == 7:
-                bot.sendMessage("970798258869911562",m['content'][15:])
-            else:
-                bot.sendMessage(m['channel_id'],m['content'][15:])
+            bot.sendMessage(m['channel_id'],m['content'][15:])
+        
+        if (m['content'][:15] == f"$specbotreset {bot_num}"):
+            sleep(2)
+            say_confirm_response(m['channel_id'],f"$kakerareset {self_id}")
+            if gold_keep_toggle:
+                say_y_response(m['channel_id'],f"$gold 4")
+                sleep(2)
+            if username != "kjh":
+                bot.sendMessage(m['channel_id'],f"$pr {self_id}")
+                sleep(15)
         
         roll_channel_id = m['channel_id']
         
@@ -99,11 +107,9 @@ def helloworld(resp):
                 
                 # bot.addReaction(m['channel_id'], m['id'], "sad_pirate:980994471544115231")
                 sleep(4)
-                say_y_response(m['channel_id'],f"$bronze 4")
-                say_y_response(m['channel_id'],f"$gold 4")
-                say_y_response(m['channel_id'],f"$ruby 4")
-                say_y_response(m['channel_id'],f"$sapphire 4")
-                say_y_response(m['channel_id'],f"$emerald 4")
+                for ti, tv in tier_toggle.items():
+                    if tv:
+                        say_y_response(m['channel_id'],f"${ti} 4") 
 
                 sleep(2)
                 bot.sendMessage(m['channel_id'],f"$dk")
@@ -116,8 +122,11 @@ def helloworld(resp):
                     bot.sendMessage(m['channel_id'],f"$wa")
                 sleep(30)
                 say_confirm_response(m['channel_id'],f"$kakerareset {self_id}")
+                if gold_keep_toggle:
+                    say_y_response(m['channel_id'],f"$gold 4")
+                    sleep(2)
                 if username != "kjh":
-                    say_y_response(m['channel_id'],f"$givek 978105521754218547 130000")
+                    say_y_response(m['channel_id'],f"$givek 978105521754218547 {gold_to_return}")
                 
             
             if (len(m['embeds']) > 0) and (m['author']['id'] == "432610292342587392"): #and (messagan == "Mudae"): #make sure this is only from mudae

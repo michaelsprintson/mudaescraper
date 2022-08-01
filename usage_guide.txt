@@ -1,0 +1,41 @@
+step 1: edit settings.py
+
+	1a: change tier_costs to server settings
+
+	1b: if you can afford to keep gold around (40k) then change the toggle to True (make sure its capitalized)
+
+	1c: change tier toggles based on what you can afford 
+
+	note: you only need to be able to afford each tier toggle once, but you need to be able to afford gold for all the bots to turn the keep toggle on.
+
+	note 2: you have to reset the bots (yes, all 7) every time you change settings.py. this is a limitation with python not being able to reload packages after the kernel starts, sorry about that. I could probably write a solution where you put the settings in JSON or YAML but it would be harder to edit and restarting the bots is a good idea anyways so im gonna leave it
+
+
+step 2: start the farmers
+
+	2a: whip open the terminal and cd to the directory where the farmers are stored.
+			ex: "cd Documents/nosync.nosync/personal/mudaescraper" (obv this one works only for me)
+	2b: begin the python venv environment
+			ex: "source screnv/bin/activate" NOTE; CHANGE TO BE WINDOWS-SPECIFIC (ASK HARVO)
+	2c: start the bots
+			use: python3 moneyprinter.py 6 & python3 moneyprinter.py 5 & python3 moneyprinter.py 4 & python3 moneyprinter.py 3 & python3 moneyprinter.py 2 & python3 moneyprinter.py 1
+
+	note: if you know anything about bash scripts you would know they are a great usage in this application, but when you close the terminal window after calling these in a bash script not all of the python threads actually end, meaning you have to go manually close them in activity monitor which i did not like doing. again there is most defenitely a good solution to this that I won't bother making 
+
+step 3: start the control
+
+	note: do this after the farmers in a seperate terminal window
+
+	3a: repeat steps 2a and 2b
+
+	3b: determine what state you want the farm to start in 
+
+		3b1: 0 if you want claims the first hour, 1 otherwise
+
+		3b2: 60 if the last claims were an hour ago (instantly start rolling and claiming)
+
+			note: if you want the bots to start in 20 minutes, put in 40. If you want them to start in 5 minutes, type 55 etc
+
+	3c: run "python3 moneyprinterpt2.py 3b1 3b2"
+
+		ex: "python3 moneyprinterpt2.py 0 60" for rolls and claims that start instantly
