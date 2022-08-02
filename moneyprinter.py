@@ -2,13 +2,9 @@
 # Import the os module.
 from time import sleep
 import re
-import json
 from discum.utils.button import Buttoner
-from functools import reduce
-import pickle
 from dotenv import load_dotenv
 import os
-import numpy as np
 import sys
 load_dotenv()
 # Grab the API token from the .env file.
@@ -87,6 +83,12 @@ def helloworld(resp):
             if username != "kjh":
                 bot.sendMessage(m['channel_id'],f"$pr {self_id}")
                 sleep(15)
+
+        if username == "kjh":
+            if m['content'][:10] == "$givemoney":
+                kname = m['content'].split(" ")[1]
+                kval = m['content'].split(" ")[2]
+                say_y_response(m['channel_id'],f"$givek {kname} {kval}")
         
         roll_channel_id = m['channel_id']
         
