@@ -1,0 +1,11 @@
+download this github to a folder on your computer
+download the .env file i gave you into the folder you downloaded
+open a bash terminal in the folder
+type the following lines one-by-one:
+
+	python3 -m venv screnv
+	source screnv/scripts/activate
+	pip3.10 install --upgrade git+https://github.com/Merubokkusu/Discord-S.C.U.M.git#egg=discum
+	pip3.10 install python-dotenv numpy
+
+proceed to usage file
